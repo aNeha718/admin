@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard</title>
+  <style>
+    body{font-family:Arial;background:#f4f4f9;padding:20px;}
+    input{padding:5px;margin:5px;}
+    button{padding:5px 10px;margin:5px;cursor:pointer;}
+    table{width:100%;border-collapse:collapse;margin-top:10px;}
+    th,td{border:1px solid #ccc;padding:8px;text-align:center;}
+  </style>
+</head>
+<body>
+<h2>Admin Dashboard</h2>
+
+<input id="title" placeholder="Event Title">
+<input id="date" type="date">
+<button onclick="addEvent()">Add Event</button>
+
+<table id="eventTable"></table>
+<h3>Participants</h3>
+<table id="participantTable"></table>
+
+<script>
+async function loadEvents(){
+  const res=await fetch("http://localhost:3000/events");
+  const data=await res.json();
+  let html="<tr><th>ID</th><th>Title</th><th>Date</th><th>Actions</th></tr>";
+  data.forEach(e=>{
+    html+=`<tr><td>${e.id}</td><td>${e.title}</td><td>${e.date}</td>
+    <td><button onclick="del(${e.id})">Delete</button>
+    <button onclick="view(${e.id})">View Participants</button></td></tr>`;
+  });
+  document.getElementById("eventTable").innerHTML=html;
+}
+
+async function addEvent(){
+  const title=document.getElementById("title").value;
+  const date=document.getElementById("date").value;
+  await fetch("http://localhost:3000/events",{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({title,date})});
+  loadEvents();
+}
+
+async function del(id){
+  await fetch(`http://localhost:3000/events/${id}`,{method:"DELETE"});
+  loadEvents();
+}
+
+async function view(id){
+  const res=await fetch("http://localhost:3000/participants/"+id);
+  const data=await res.json();
+  let html="<tr><th>Name</th></tr>";
+  data.forEach(p=>html+=`<tr><td>${p.username}</td></tr>`);
+  document.getElementById("participantTable").innerHTML=html;
+}
+
+loadEvents();
+</script>
+</body>
+</html>

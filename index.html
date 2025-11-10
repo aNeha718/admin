@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+  <style>
+    body{font-family:Arial;background:#f4f4f9;display:flex;justify-content:center;align-items:center;height:100vh;}
+    .box{background:white;padding:20px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,0.1);}
+    input{margin:5px;width:95%;padding:8px;}
+    button{width:100%;padding:8px;background:#333;color:white;border:none;cursor:pointer;}
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Login</h2>
+    <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <p>New user? <a href="register.html">Register here</a></p>
+    <p id="msg" style="color:red;"></p>
+  </div>
+
+<script>
+async function login(){
+  const u=document.getElementById("username").value;
+  const p=document.getElementById("password").value;
+  const res=await fetch("http://localhost:3000/login",{
+    method:"POST",headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({username:u,password:p})
+  });
+  const data=await res.json();
+  if(data.ok){
+    if(data.role==="admin") window.location.href="admin.html";
+    else window.location.href="user.html";
+  } else {
+    document.getElementById("msg").innerText="Invalid login!";
+  }
+}
+</script>
+</body>
+</html>
